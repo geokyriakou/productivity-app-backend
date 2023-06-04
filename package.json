@@ -22,6 +22,9 @@
     "nodemailer": "^6.9.3",
     "socket.io": "^4.6.1"
   },
+  "engines": {
+    "node": ">=14.20.1"
+  },
   "devDependencies": {
     "nodemon": "^2.0.21",
     "vite-plugin-rewrite-all": "^1.0.1"
