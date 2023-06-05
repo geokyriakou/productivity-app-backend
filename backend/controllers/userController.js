@@ -47,7 +47,7 @@ const registerUser = asyncHandler(async (req, res) => {
       avgFocus: 0,
     });
 
-    const url = `http://127.0.0.1:5173/${user._id}/confirm`;
+    const url = `https://pomoshare.onrender.com/${user._id}/confirm`;
 
     const transporter = nodemailer.createTransport({
       // service: "outlook",
@@ -176,7 +176,7 @@ const sendPasswordResetEmail = asyncHandler(async (req, res) => {
     }
   );
 
-  const url = `http://127.0.0.1:5173/password/reset/${user._id}/${resetToken}`;
+  const url = `https://pomoshare.onrender.com/password/reset/${user._id}/${resetToken}`;
 
   const transporter = nodemailer.createTransport({
     host: "smtp-mail.outlook.com", // hostname
