@@ -47,7 +47,7 @@ const registerUser = asyncHandler(async (req, res) => {
       avgFocus: 0,
     });
 
-    const url = `https://pomoshare.onrender.com/${user._id}/confirm`;
+    const url = `http://127.0.0.1:5173/${user._id}/confirm`;
 
     const transporter = nodemailer.createTransport({
       // service: "outlook",
@@ -176,7 +176,7 @@ const sendPasswordResetEmail = asyncHandler(async (req, res) => {
     }
   );
 
-  const url = `https://pomoshare.onrender.com/password/reset/${user._id}/${resetToken}`;
+  const url = `http://127.0.0.1:5173/password/reset/${user._id}/${resetToken}`;
 
   const transporter = nodemailer.createTransport({
     host: "smtp-mail.outlook.com", // hostname
@@ -272,19 +272,22 @@ const updateUser = asyncHandler(async (req, res) => {
     throw new Error("User not found");
   }
 
-  let focus = user?.focusTime;
+  let focus = user.focusTime;
 
   if (typeof req.body.focusTime === "number") {
-    focus[today.getDay()] = req.body.focusTime;
-    req.body.focusTime = focus;
+    if (focus[today.getDay()] > req.body.focusTime) {
+      req.body.focusTime = focus;
+    } else {
+      focus[today.getDay()] = req.body.focusTime;
+      req.body.focusTime = focus;
+      const avgFocus = focus.reduce((a, b) => a + b, 0) / focus.length;
 
-    const avgFocus = focus.reduce((a, b) => a + b, 0) / focus.length;
-
-    const leaderboardEntry = await Leaderboard.findOneAndUpdate(
-      { user: user._id },
-      { avgFocus: avgFocus },
-      { new: true }
-    );
+      const leaderboardEntry = await Leaderboard.findOneAndUpdate(
+        { user: user._id },
+        { avgFocus: avgFocus },
+        { new: true }
+      );
+    }
   }
 
   const updatedUser = await User.findByIdAndUpdate(req.params.id, req.body, {
@@ -296,19 +299,19 @@ const updateUser = asyncHandler(async (req, res) => {
 const updateScore = asyncHandler(async (req, res) => {
   const user = await User.findById(req.params.id);
 
+  const updatedUser = await User.findByIdAndUpdate(
+    req.params.id,
+    { $inc: { score: req.body.score } },
+    {
+      new: true,
+    }
+  ).select("-password");
+
   const leaderboardEntry = await Leaderboard.findOneAndUpdate(
     { user: user._id },
-    { $inc: { score: req.body.score } },
+    { score: updatedUser.score },
     { new: true }
   );
-
-  // const updatedUser = await User.findByIdAndUpdate(
-  //   req.params.id,
-  //   { $inc: { score: req.body.score } },
-  //   {
-  //     new: true,
-  //   }
-  // ).select("-password");
 
   res.status(200).json(updatedUser);
 });

@@ -32,7 +32,7 @@ const { Server } = require("socket.io");
 
 const io = new Server(server, {
   cors: {
-    origin: "https://pomoshare.onrender.com",
+    origin: "http://127.0.0.1:5173",
   },
 });
 
@@ -43,7 +43,7 @@ io.on("connection", (socket) => {
     socket.on("update-timer", (newSeconds, newType, newPlaying) => {
       socket.to(room).emit("timer", newSeconds, newType, newPlaying);
     });
-    console.log(`Joined ${room} with name ${name}`);
+    // console.log(`Joined ${room} with name ${name}`);
   });
 
   socket.on("send-message", (message, room) => {
@@ -54,16 +54,21 @@ io.on("connection", (socket) => {
   socket.on("disconnect-user", (room) => {
     const name = socket.handshake.query.username;
     socket.to(room).emit("user-disconnected", name);
-    console.log(`left ${room} with name ${name}`);
+    // console.log(`left ${room} with name ${name}`);
   });
 
   socket.on("settings-change", (room, setting, value) => {
     const name = socket.handshake.query.username;
     socket.to(room).emit("changed-room", setting, value, name);
-    console.log(`${setting} ${value} ${name}`);
+    // console.log(`${setting} ${value} ${name}`);
   });
 
   socket.on("play-pause", (room, play) => {
     socket.to(room).emit("new-isPlaying", play);
+  });
+
+  socket.on("change-session", (room, type, seconds) => {
+    const name = socket.handshake.query.username;
+    socket.to(room).emit("type-change", type, seconds, name);
   });
 });
