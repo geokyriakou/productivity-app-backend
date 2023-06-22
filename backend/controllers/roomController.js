@@ -74,10 +74,14 @@ const joinRoom = asyncHandler(async (req, res) => {
       if (users.length === 1) return users[0];
       const userMSEs = users.map((user) => ({
         ...user.toObject(),
-        mse: Math.pow(user.score - req.user.score, 2),
+        mse:
+          (1 / 3) *
+          (Math.pow(user.score - req.user.score, 2) +
+            Math.pow(user.daysStreak - req.user.daysStreak, 2) +
+            Math.pow(user.experienceLevel - req.user.experienceLevel, 2)),
       }));
 
-      const closestUser = userMSEs.sort((a, b) => a.mse - b.mse)[1];
+      const closestUser = userMSEs.sort((a, b) => b.mse - a.mse)[1];
       return closestUser;
     });
 
