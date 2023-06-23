@@ -32,7 +32,7 @@ const { Server } = require("socket.io");
 
 const io = new Server(server, {
   cors: {
-    origin: "https://pomoshare.onrender.com",
+    origin: "http://127.0.0.1:5173",
   },
 });
 
@@ -54,6 +54,7 @@ io.on("connection", (socket) => {
   socket.on("disconnect-user", (room) => {
     const name = socket.handshake.query.username;
     socket.to(room).emit("user-disconnected", name);
+    socket.leave(room);
     // console.log(`left ${room} with name ${name}`);
   });
 
