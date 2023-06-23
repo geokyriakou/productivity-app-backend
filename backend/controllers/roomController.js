@@ -121,8 +121,6 @@ const updateRoom = asyncHandler(async (req, res) => {
     res.status(401);
     throw new Error("User not authorized");
   }
-  console.log(req.body.member1);
-  console.log(req.body.member2);
 
   if (
     req.body.member1.toString() !== req.user.id &&
