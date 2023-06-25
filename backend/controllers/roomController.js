@@ -122,13 +122,6 @@ const updateRoom = asyncHandler(async (req, res) => {
     throw new Error("User not authorized");
   }
 
-  if (
-    req.body.member1.toString() !== req.user.id &&
-    req.body.member2.toString() !== req.user.id
-  ) {
-    await deleteRoom(req, res);
-  }
-
   const updatedRoom = await Room.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
   });
