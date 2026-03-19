@@ -47,6 +47,7 @@ const registerUser = asyncHandler(async (req, res) => {
       avgFocus: 0,
     });
 
+    /*
     const url = `https://pomoshare.onrender.com/${user._id}/confirm`;
 
     const transporter = nodemailer.createTransport({
@@ -69,6 +70,7 @@ const registerUser = asyncHandler(async (req, res) => {
       subject: "Confirm Account",
       html: `Please click this email to confirm your email address: <a href="${url}">Confirm Email</a>`,
     });
+    */
 
     res.status(201).json({
       _id: user.id,
@@ -93,7 +95,7 @@ const tokenGen = asyncHandler(async (req, res) => {
       {
         algorithm: "HS256",
         expiresIn: "10 days",
-      }
+      },
     );
     res.json({ accessToken: accessToken });
   });
@@ -114,10 +116,10 @@ const loginUser = asyncHandler(async (req, res) => {
     res.status(400);
     throw new Error("Invalid credentials");
   }
-  if (!user.confirmed) {
-    res.status(400);
-    throw new Error("Please confirm your email to login");
-  }
+  // if (!user.confirmed) {
+  //   res.status(400);
+  //   throw new Error("Please confirm your email to login");
+  // }
 
   const accessToken = jwt.sign(
     { id: user.id, username: user.username },
@@ -125,12 +127,12 @@ const loginUser = asyncHandler(async (req, res) => {
     {
       algorithm: "HS256",
       expiresIn: "10 days",
-    }
+    },
   );
 
   const refreshToken = jwt.sign(
     { id: user.id, username: user.username },
-    process.env.REFRESH_TOKEN_SECRET
+    process.env.REFRESH_TOKEN_SECRET,
   );
 
   if (user && (await bcrypt.compare(password, user.password))) {
@@ -150,7 +152,7 @@ const loginUser = asyncHandler(async (req, res) => {
       { isActive: true },
       {
         new: true,
-      }
+      },
     ).select("-password");
   } else {
     res.status(400);
@@ -173,7 +175,7 @@ const sendPasswordResetEmail = asyncHandler(async (req, res) => {
     user.password + "-" + user.createdAt,
     {
       expiresIn: "1h",
-    }
+    },
   );
 
   const url = `https://pomoshare.onrender.com/password/reset/${user._id}/${resetToken}`;
@@ -225,7 +227,7 @@ const resetPassword = asyncHandler(async (req, res) => {
     { password: hashedPassword },
     {
       new: true,
-    }
+    },
   ).select("-password");
   res.status(200).json(updatedUser);
 });
@@ -243,7 +245,7 @@ const confirmEmail = asyncHandler(async (req, res) => {
     { confirmed: true },
     {
       new: true,
-    }
+    },
   ).select("-password");
   res.status(200).json(updatedUser);
 });
@@ -285,7 +287,7 @@ const updateUser = asyncHandler(async (req, res) => {
       const leaderboardEntry = await Leaderboard.findOneAndUpdate(
         { user: user._id },
         { avgFocus: avgFocus },
-        { new: true }
+        { new: true },
       );
     }
   }
@@ -304,13 +306,13 @@ const updateScore = asyncHandler(async (req, res) => {
     { $inc: { score: req.body.score } },
     {
       new: true,
-    }
+    },
   ).select("-password");
 
   const leaderboardEntry = await Leaderboard.findOneAndUpdate(
     { user: user._id },
     { score: updatedUser.score },
-    { new: true }
+    { new: true },
   );
 
   res.status(200).json(updatedUser);

@@ -1,7 +1,7 @@
 const express = require("express");
 const dotenv = require("dotenv").config();
 const colors = require("colors");
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 3000;
 const connectDB = require("./config/db");
 const http = require("http"); // access directly for socket io
 const cors = require("cors");
@@ -13,7 +13,7 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded());
+app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/users", require("./routes/userRouter"));
 app.use("/api/tasks", require("./routes/taskRouter"));
